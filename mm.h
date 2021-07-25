@@ -1,7 +1,5 @@
 #define SIZEX 1000
 #define SIZEY 1000
-#define MAXBUF 512
-#define BLOCK_SIZE 100
 
 long * huge_matrixA;
 long * huge_matrixB;
@@ -21,8 +19,10 @@ void load_matrix();
 void multiply();
 
 // Any additional variables needed go here
+#define MAXBUF 256
 long row = SIZEX;	    //row
 long col = SIZEY;	    //column
+
 
 // Any helper functions go here
 

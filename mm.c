@@ -8,24 +8,22 @@
 void flush_all_caches(){
 
     for (long i = 0; i < (row * col); i++){
-		asm volatile("clflush (%0)\n\t"
-					: 
-					: "r"(huge_matrixA + i)
-					: "memory");
-		asm volatile("clflush (%0)\n\t"
-					: 
-					: "r"(huge_matrixB + i)
-					: "memory");
-		asm volatile("clflush (%0)\n\t"
-					: 
-					: "r"(huge_matrixC + i)
-					: "memory");
+		asm volatile("clflush (%0)\n\t" 
+						:
+						: "r"(huge_matrixA + i) 
+						: "memory");
+		asm volatile("clflush (%0)\n\t" 
+						:
+						: "r"(huge_matrixB + i) 
+						: "memory");
+		asm volatile("clflush (%0)\n\t" 
+						:
+						: "r"(huge_matrixC + i) 
+						: "memory");
+
     }
 
-    asm volatile("sfence\n\t" 
-                 :
-                 :
-                 : "memory");
+    asm volatile("sfence\n\t" ::: "memory");
 
 }
 
@@ -59,12 +57,12 @@ void multiply_base()
 	// Implement your baseline matrix multiply here.
 
 	for (long i = 0; i < row; i++){
-		for (long v = 0; v < col; v++){
+		for (long j= 0; j < col; j++){
 			long result = 0;
-			for (long d = 0; d < col; d++){
-				result += (huge_matrixA[(row * i) + d] * huge_matrixB[(d * col) + col]);
+			for (long k = 0; k < col; k++){
+				result += (huge_matrixA[(row * i) + k] * huge_matrixB[(k * col) + j]);
             }
-            huge_matrixC[(i * row) + v] = result;
+            huge_matrixC[(i * row) + j] = result;
 		}
 	}
 
@@ -73,12 +71,13 @@ void multiply_base()
 void compare_results()
 {
 	fout = fopen("./out.in","r");
+	ftest = fopen("./reference.in","r");
 	long i;
 	long temp1, temp2;
 	for(i=0;i<((long)SIZEX*(long)SIZEY);i++)
 	{
 		fscanf(fout, "%ld", &temp1);
-		fscanf(fout, "%ld", &temp2);
+		fscanf(ftest, "%ld", &temp2);
 		if(temp1!=temp2)
 		{
 			printf("Wrong solution!");
@@ -96,15 +95,15 @@ void write_results()
 	// Basically, make sure the result is written on fout
 	// Each line represent value in the X-dimension of your matrix
 
-	char buffer[MAXBUF];
 	fout = fopen("./out.in","w");
+	
 	for (long i = 0; i < row; i++){
-		for (long j = 0; i < col; j++){
-			memset(buffer, 0, MAXBUF);
-			sprintf(buffer, "%ld", huge_matrixC[(i * row) + j]);
+		for (long j = 0; j < col; j++){
+			char buffer[MAXBUF];
+			sprintf(buffer, "%ld ", huge_matrixC[(i * row) + j]);
 			fwrite(buffer, sizeof(char), strlen(buffer), fout);
 		}
-		fwrite("\n", sizeof(char), 2, fout);
+		fwrite("\n", sizeof(char), strlen("\n"), fout);
 	}
 }
 
@@ -128,6 +127,7 @@ void multiply()
 {
 	// Your code here
 	//blocked matrix multiplication -> seperated blocks, done each and connected
+	long BLOCK_SIZE = 100;
 	for (long ii = 0; ii < row; ii += BLOCK_SIZE){
 		for (long jj = 0; jj < col; jj += BLOCK_SIZE){
 			for (long kk = 0; kk < row; kk += BLOCK_SIZE){
@@ -135,7 +135,7 @@ void multiply()
 				for (long i = 0; i < BLOCK_SIZE; i++){
 					for (long j = 0; j < BLOCK_SIZE; j++){
 						for (long k = 0; k < BLOCK_SIZE; k++){
-							huge_matrixC[(row * (i+ii)) + (j+jj)] += (huge_matrixA[(row * (k+kk)) + (j+jj)] * huge_matrixB[(row * (i+ii)) + (k+kk)]);
+							huge_matrixC[(row * (i+ii)) + (j+jj)] += huge_matrixA[(row * (i+ii)) + (k+kk)] * huge_matrixB[(row * (k+kk)) + (j+jj)];
 						}
 					}
 				}
@@ -146,6 +146,7 @@ void multiply()
 
 int main()
 {
+
 	clock_t s,t;
 	double total_in_base = 0.0;
 	double total_in_your = 0.0;
@@ -156,7 +157,7 @@ int main()
 	fout = fopen("./out.in","w");
 	ftest = fopen("./reference.in","r");
 	
-	flush_all_caches();
+	// flush_all_caches();
 
 	s = clock();
 	load_matrix_base();
@@ -172,9 +173,15 @@ int main()
 	fclose(fin1);
 	fclose(fin2);
 	fclose(fout);
-	free_all();
+	// free_all();
 
 	flush_all_caches();
+	free_all();
+
+	fin1 = fopen("./input1.in","r");
+	fin2 = fopen("./input2.in","r");
+	fout = fopen("./out.in","w");
+	ftest = fopen("./reference.in","r");
 
 	s = clock();
 	load_matrix();
