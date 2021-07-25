@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<time.h>
 #include <string.h>
+#include <pthread.h>
 #include "mm.h"
 
 // Task 1: Flush the cache so that we can do our measurement :)
@@ -222,17 +223,18 @@ int main()
 /*
 
    collaborators
+
    * Thanthong Chim-ong 6280026
 
    references
 
-	flush caches
-		* https://stackoverflow.com/questions/11277984/how-to-flush-the-cpu-cache-in-linux-from-a-c-program
+   * flush caches
+	* https://stackoverflow.com/questions/11277984/how-to-flush-the-cpu-cache-in-linux-from-a-c-program
 
 
-	matrix multiplication
-		* https://malithjayaweera.com/2020/07/blocked-matrix-multiplication/
-		* https://www.youtube.com/watch?v=5MFWywYY9bE
-		* https://iitd-plos.github.io/col729/lec/matrix_multiplication.html
+   * matrix multiplication
+	* https://malithjayaweera.com/2020/07/blocked-matrix-multiplication/
+	* https://www.youtube.com/watch?v=5MFWywYY9bE
+	* https://iitd-plos.github.io/col729/lec/matrix_multiplication.html
 
 */
