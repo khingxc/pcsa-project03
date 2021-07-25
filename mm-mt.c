@@ -145,20 +145,26 @@ void multiply()
 
 	*/
 
-	for (long ii = 0; ii < row; ii += BLOCK_SIZE){
-		for (long jj = 0; jj < col; jj += BLOCK_SIZE){
-			for (long kk = 0; kk < row; kk += BLOCK_SIZE){
-				for (long i = 0; i < BLOCK_SIZE; i++){
-					for (long j = 0; j < BLOCK_SIZE; j++){
-						for (long k = 0; k < BLOCK_SIZE; k++){
-							huge_matrixC[(row * (i+ii)) + (j+jj)] += huge_matrixA[(row * (i+ii)) + (k+kk)] * huge_matrixB[(row * (k+kk)) + (j+jj)];
-						}
+	for (long jj = 0; jj < col; jj += BLOCK_SIZE){
+		for (long kk = 0; kk < row; kk += BLOCK_SIZE){
+			for (long i = 0; i < col; i++){
+				for (long j = 0; j < BLOCK_SIZE; j++){
+					long sum = huge_matrixC[(row * i) + (j+jj)];
+					for (long k = 0; k < BLOCK_SIZE; k++){
+						sum += huge_matrixA[(row * i) + (k+kk)] * huge_matrixB[(row * (k+kk)) + (j+jj)];
 					}
+					huge_matrixC[(row * i) + (j+jj)] = sum;
 				}
 			}
 		}
 	}
 }
+
+//block > base
+
+//===================================================================================================================================================================================================
+
+
 
 int main()
 {
